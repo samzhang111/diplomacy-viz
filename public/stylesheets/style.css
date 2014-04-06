@@ -1,0 +1,83 @@
+body {
+  padding: 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+h1 {
+		font-size: 50px;
+}
+a {
+  color: #00B7FF;
+}
+
+#desc {
+		font-size: 24px;
+		width: 50%;
+}
+
+svg {
+  margin: 50px;
+}
+.land {
+  fill: #fff;
+  stroke: #ccc;
+}
+
+.country {
+  fill: #ccc;
+  stroke: #666;
+}
+
+.country:hover {
+  fill: #ff530d;
+}
+
+.selected {
+  fill: #ff2100;
+}
+
+.selected:hover {
+  fill: #cc0000;
+}
+
+#container {
+		margin-top: 20px;
+  max-width: 50%;
+	min-height:70px;
+}
+
+#bigname {
+  font-size:50px;
+	margin:0;
+	padding:0;
+	display: inline;
+	list-style: none;
+}
+
+.item {
+	height: 50px;
+  display: inline;
+	list-style: none;
+}
+
+#second {
+  float: right;
+}
+
+.info {
+  left: 20%;
+	font-size: 30px;
+}
+
+#year {
+  margin-left:600px;
+  font-size:30px;
+}
+
+#timeline {
+	margin-left:50px;	
+  width:1200px;
+}
+
+.arc {
+	fill: none;
+}

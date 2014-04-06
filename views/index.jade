@@ -1,0 +1,14 @@
+extends layout
+
+block content
+  h1 DIPLOMACY
+  div#desc
+    | Diplomacy is a curious thing. Governments that ally one day turn on each other the next. This visualization uses sampling from the 12GB <a href="www.gdeltproject.org">GDELT database</a> to map diplomatic interactions. The bluer lines represent beneficial interactions such as economic assistance. The darker reds represent aggression, sanctions, and eventually, war. Thicker lines represent more interactions. The timeline changes year. Press any two countries to begin.
+  div#container
+    ul#bigname
+      li#first.item &nbsp;
+      li#second.item &nbsp;
+  div#timeline-container
+    div#year 1992
+    div#timeline 
+  div#svg
