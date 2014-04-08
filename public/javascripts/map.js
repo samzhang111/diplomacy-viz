@@ -1,4 +1,3 @@
-
 $(document).ready(function() {
     var colors = d3.scale.linear().domain([-10, 10]).range(["#f00", "#0ff"]);
     var width = 1200;
@@ -9,6 +8,8 @@ $(document).ready(function() {
     .scale((width + 1) / 2 / Math.PI)
     .translate([width / 2, height / 2 + ypad])
     .precision(.1);
+    var timers = {};
+    var year = 1992;
 
 
     var path = d3.geo.path().projection(projection);
@@ -56,7 +57,7 @@ $(document).ready(function() {
             }
             else if (!second) {
                 $("#second").text(d.properties.name);
-                query_mouseover(country_one, d.properties.name, $(year).text());
+                query_mouseover(country_one, d.properties.name, year);
             }
         })
         .on("mouseout", function(d) {
@@ -76,8 +77,7 @@ $(document).ready(function() {
                 if (this != first) {
                     second = this;
                     country_two=d;
-                    console.log(year, $(year).text());
-                    lines = query(country_one, country_two, $(year).text());
+                    lines = query(country_one, country_two, year);
                 }
             }
             else {
@@ -94,22 +94,35 @@ $(document).ready(function() {
         });
 
     });
-
+    function delaySlider(country_one, country_two, year) {
+        clearTimeout(timers.slider);
+        timers.slider = setTimeout(function() {
+            if (country_one && country_two) {
+                query(country_one, country_two, year);
+            }
+        }, 300);
+    }
     $("#timeline").slider({
         range: false,
         min: 1971,
         max: 2001,
-        value: 1986,
+        value: year,
         slide: function( event, ui ) {
             year = ui.value;
             $("#year").text(ui.value);
-            if (country_one && country_two) {
-                query(country_one, country_two, ui.value);
-            }
-            //query_slide(year, country_one, country_two);
+            delaySlider(country_one, country_two, year);
         }
     });
     
+    function make_path(d, datum) {
+        var start = d[0];
+        var end = d[1];
+
+        var dx = start[0] - end[0],
+            dy = start[1] - end[1],
+            dr = Math.sqrt(dx * dx + dy * dy) * (datum+.01)/1.5;
+        return "M" + start[0] + "," + start[1] + "A" + dr + "," + dr + " 0 0,1 " + end[0] + "," + end[1];
+    }
     function query(country_one, country_two, year) {
         // get country codes for country_one and country_two
         // send query for country_one and country_two
@@ -126,6 +139,7 @@ $(document).ready(function() {
         console.log(year, iso[country_one.properties.name],iso[country_two.properties.name]);
         var c1 = get_center(country_one); 
         var c2 = get_center(country_two);
+        var path = [];
         $.get("_click", {
             year:year,
             source:iso[country_one.properties.name],
@@ -137,63 +151,43 @@ $(document).ready(function() {
                 for (var datum in data) {
                     total += 1;
                 }
-                for (var datum in data) {
-                    console.log(datum);
-                    var path = svg.append("path")
-                    .datum([c1, c2])
-                    .attr("d", function(d) {
-                        var start = d[0];
-                        var end = d[1];
-                        console.log(start, end);
-
-                        var dx = start[0] - end[0],
-                            dy = start[1] - end[1],
-                            dr = Math.sqrt(dx * dx + dy * dy) * datum/1.5;
-                        return "M" + start[0] + "," + start[1] + "A" + dr + "," + dr + " 0 0,1 " + end[0] + "," + end[1];
-                    }).attr("class", "arc")
+                for (datum in data) {
+                    var p = svg.append("path")
+                      .datum([c1, c2])
+                      .attr("d", function(d) { return make_path(d, datum) })
+                      .attr("class", "arc")
                       .attr("stroke", colors(datum))
                       .attr("stroke-width", Math.log(data[datum])/total*30);
                   
-                  var totalLength = path.node().getTotalLength();
-                  path.attr("stroke-dasharray", totalLength + " " + totalLength)
+                    var totalLength = p.node().getTotalLength();
+                    p.attr("stroke-dasharray", totalLength + " " + totalLength)
                       .attr("stroke-dashoffset", totalLength)
                       .transition()
-                    .duration(2000)
-                    .attr("stroke-dashoffset", 0);
-                    }
+                      .duration(2000)
+                      .attr("stroke-dashoffset", 0);
 
+                    path.push(p);
                 }
+
+            }
             else {
                 // draw lines
-                var path = svg.append("path")
+                var p = svg.append("path")
                     .datum([c1, c2])
-                    .attr("d", function(d) {
-                        var start = d[0];
-                        var end = d[1];
-                        console.log(start, end);
-
-                        var dx = start[0] - end[0],
-                            dy = start[1] - end[1],
-                            dr = Math.sqrt(dx * dx + dy * dy);
-                        //var parsed = "M" + start[0] + "," + start[1] + " L " + end[0] +","+ end[1];
-
-                        //console.log(parsed);
-                        //return parsed;
-                        return "M" + start[0] + "," + start[1] + "A" + dr + "," + dr + " 0 0,1 " + end[0] + "," + end[1];
-                    }).attr("class", "arc");
+                    .attr("d", make_path(d, 1.5)) //1.5 is a magic number. see function
+                    .attr("class", "arc");
                 
-                  var totalLength = path.node().getTotalLength();
-                  path.attr("stroke-dasharray", totalLength + " " + totalLength)
-                      .attr("stroke-dashoffset", totalLength)
-                      .transition()
+                var totalLength = p.node().getTotalLength();
+                p.attr("stroke-dasharray", totalLength + " " + totalLength)
+                    .attr("stroke-dashoffset", totalLength)
+                    .transition()
                     .duration(2000)
                     .attr("stroke-dashoffset", 0);
-                    }
-                });
+                path.push(p);
+            }
+        });
         
-
-          
-          return path;
+      return path;
     }
     function query_slide(year, country_one, country_two) {
     }
