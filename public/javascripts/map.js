@@ -76,6 +76,7 @@ $(document).ready(function() {
                 if (this != first) {
                     second = this;
                     country_two=d;
+                    console.log(year, $(year).text());
                     lines = query(country_one, country_two, $(year).text());
                 }
             }

@@ -27,24 +27,28 @@ exports.click = function(req, res) {
   var year = req.query.year;
   var source = req.query.source;
   var target = req.query.target;
-  var range_begin = year + "-01-01";
-  var range_end = year + "-12-12";
-  var hist = {};
-  connection.query("SELECT goldstein FROM gdelt WHERE conflict_date >= '" +range_begin+"' AND conflict_date <= '"+range_end+"' AND source_country='"+source+"' AND target_country='"+target+"' LIMIT 1000", function(err, rows, fields) {
-      if (err) console.dir(err);
-      for (var i=0; i<rows.length; i++) {
-        var val = parseInt(rows[i].goldstein);
-        if (hist[val]) {
-            hist[val]+=1;
-        }
-        else {
-            hist[val]=1;
-        }
-      }
-      console.dir(hist);
-      res.send(hist);
-  });
-  
+  if (year && source && target) {
+      var range_begin = year + "-01-01";
+      var range_end = year + "-12-12";
+      var hist = {};
+      connection.query("SELECT goldstein FROM gdelt WHERE conflict_date >= '" +range_begin+"' AND conflict_date <= '"+range_end+"' AND source_country='"+source+"' AND target_country='"+target+"' LIMIT 1000", function(err, rows, fields) {
+          if (err) console.dir(err);
+          for (var i=0; i<rows.length; i++) {
+            var val = parseInt(rows[i].goldstein);
+            if (hist[val]) {
+                hist[val]+=1;
+            }
+            else {
+                hist[val]=1;
+            }
+          }
+          console.dir(hist);
+          res.send(hist);
+      });
+    }
+  else {
+      res.send({});
+  }
 
 };
 
