@@ -28,19 +28,19 @@ svg {
 }
 
 .country:hover {
-  fill: #ff530d;
+  fill: #97bb6c;
 }
 
 .selected {
-  fill: #ff2100;
+  fill: #cf7ec3;
 }
 
 .selected:hover {
-  fill: #cc0000;
+  fill: #cf7ec3;
 }
 
 #container {
-		margin-top: 20px;
+  margin-top: 20px;
   max-width: 50%;
 	min-height:70px;
 }

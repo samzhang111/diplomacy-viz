@@ -23,14 +23,16 @@ fs.readFile(file, 'utf8', function (err, data) {
 
 connection.connect();
 
-exports.click = function(req, res) {
-  var year = req.query.year;
-  var source = req.query.source;
-  var target = req.query.target;
+exports.pair = function(req, res) {
+  var year = req.query.year
+     ,source = req.query.source
+     ,target = req.query.target;
+
   if (year && source && target) {
-      var range_begin = year + "-01-01";
-      var range_end = year + "-12-12";
-      var hist = {};
+      var range_begin = year + "-01-01"
+         ,range_end = year + "-12-12"
+         ,hist = {};
+      
       connection.query("SELECT goldstein FROM gdelt WHERE conflict_date >= '" +range_begin+"' AND conflict_date <= '"+range_end+"' AND source_country='"+source+"' AND target_country='"+target+"' LIMIT 1000", function(err, rows, fields) {
           if (err) console.dir(err);
           for (var i=0; i<rows.length; i++) {
@@ -52,12 +54,19 @@ exports.click = function(req, res) {
 
 };
 
-
-exports.mouseover = function(req, res) {
-  result = {};
-  if (!res.query.country_one) {
-      res.json({});
+exports.single = function(req, res) {
+  var year = req.query.year
+     ,source = req.query.source
+     ,summary = {source:source};
+  if (!year || !source) {
+      res.send(summary);
   }
-
-  res.json(result);
+  connection.query("SELECT target_country, average FROM averages WHERE year = '" +year+"'", function(err, rows, fields) {
+      if (err) console.dir(err);
+      for (var i=0; i<rows.length; i++) {
+        summary[rows[i].target_country] = rows[i].average;
+      }
+      res.send(summary);
+  });
 };
+
