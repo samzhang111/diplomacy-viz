@@ -2,7 +2,7 @@
 
 2 night project at Maryland's fabulous, fabulous bitca.mp hackathon.
 
-![screenshot](screenshot.png)
+![screenshot](https://raw.githubusercontent.com/samzhang111/diplomacy-viz/screenshot/screenshot.png)
 
 It's not online because I don't have a server that can host this 12gb database. If you'd like to help, please contact me :).
 
